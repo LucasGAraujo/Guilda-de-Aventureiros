@@ -44,21 +44,16 @@ public class AventureiroController {
         if (size < 1 || size > 50) {
             throw new RegraNegocioException("size deve estar entre 1 e 50");
         }
-
         List<Aventureiro> filtrados = service.listar(classe, ativo, nivelMin);
-
         int total = filtrados.size();
         int totalPages = (int) Math.ceil((double) total / size);
         int start = page * size;
         int end = Math.min(start + size, total);
-
         List<Aventureiro> pagina = (start >= total) ? List.of() : filtrados.subList(start, end);
-
         response.setHeader("X-Total-Count", String.valueOf(total));
         response.setHeader("X-Page", String.valueOf(page));
         response.setHeader("X-Size", String.valueOf(size));
         response.setHeader("X-Total-Pages", String.valueOf(totalPages));
-
         return pagina.stream()
                 .map(AventureiroResponseDTO::from)
                 .toList();
