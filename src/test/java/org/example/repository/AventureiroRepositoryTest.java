@@ -96,11 +96,18 @@ class AventureiroRepositoryTest {
     void deveBuscarRanking() {
         Aventureiro a = criarAventureiro("Gimli", ClasseAventureiro.GUERREIRO, 12, true);
         aventureiroRepository.save(a);
+
+        LocalDateTime inicio = LocalDateTime.now().minusDays(30);
+        LocalDateTime fim = LocalDateTime.now().plusDays(30);
+
         Page<RankingAventureiroDTO> ranking = aventureiroRepository.buscarRanking(
-                LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1), PageRequest.of(0, 10)
+                organizacaoBase.getId(),
+                inicio,
+                fim,
+                PageRequest.of(0, 10)
         );
 
-        assertThat(ranking).isNotNull();
+        assertThat(ranking.getContent()).isNotEmpty();
     }
 
     private Aventureiro criarAventureiro(String nome, ClasseAventureiro classe, Integer nivel, Boolean ativo) {

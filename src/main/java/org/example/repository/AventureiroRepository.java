@@ -39,13 +39,15 @@ public interface AventureiroRepository extends JpaRepository<Aventureiro, Long> 
             "FROM Aventureiro a " +
             "LEFT JOIN a.participacoes p " +
             "WHERE a.organizacao.id = :orgId " +
-            "AND (:dataInicio IS NULL OR p.dataRegistro >= :dataInicio) " +
-            "AND (:dataFim IS NULL OR p.dataRegistro <= :dataFim) " +
+            "AND (p IS NULL OR CAST(:dataInicio AS timestamp) IS NULL OR p.dataRegistro >= :dataInicio) " +
+            "AND (p IS NULL OR CAST(:dataFim AS timestamp) IS NULL OR p.dataRegistro <= :dataFim) " +
             "GROUP BY a.id, a.nome " +
             "ORDER BY COUNT(p) DESC",
             countQuery = "SELECT COUNT(a) FROM Aventureiro a WHERE a.organizacao.id = :orgId")
     Page<RankingAventureiroDTO> buscarRanking(
+            @Param("orgId") Long orgId,
             @Param("dataInicio") LocalDateTime dataInicio,
             @Param("dataFim") LocalDateTime dataFim,
-            Pageable pageable);
+            Pageable pageable
+    );
 }

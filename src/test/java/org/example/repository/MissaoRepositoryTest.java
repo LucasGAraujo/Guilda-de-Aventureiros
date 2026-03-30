@@ -1,16 +1,17 @@
+package org.example.repository;
 
 import org.example.DTO.MissaoMetricasDTO;
 import org.example.domain.ENUM.NivelPerigo;
 import org.example.domain.ENUM.StatusMissao;
 import org.example.domain.Missao;
 import org.example.domain.audit.Organizacao;
-import org.example.repository.MissaoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -27,7 +28,7 @@ class MissaoRepositoryTest {
     private MissaoRepository missaoRepository;
 
     @Autowired
-    private org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager entityManager;
+    private TestEntityManager entityManager;
 
     private Organizacao organizacaoBase;
 
@@ -45,14 +46,23 @@ class MissaoRepositoryTest {
         m.setNivelPerigo(NivelPerigo.RANK_A);
         m.setOrganizacao(organizacaoBase);
         m.setDataCriacao(LocalDateTime.now());
+
         missaoRepository.save(m);
 
+        entityManager.flush();
+        entityManager.clear();
+
         Page<Missao> resultado = missaoRepository.listarMissoes(
-                StatusMissao.PLANEJADA, NivelPerigo.RANK_A, null, null, PageRequest.of(0, 10)
+                StatusMissao.PLANEJADA,
+                NivelPerigo.RANK_A,
+                null,
+                null,
+                PageRequest.of(0, 10)
         );
 
         assertThat(resultado.getContent()).isNotEmpty();
-        assertThat(resultado.getContent().get(0).getTitulo()).isEqualTo("Limpar o Porão da Taverna");
+        assertThat(resultado.getContent().get(0).getTitulo())
+                .isEqualTo("Limpar o Porão da Taverna");
     }
 
     @Test
@@ -64,7 +74,11 @@ class MissaoRepositoryTest {
         m.setNivelPerigo(NivelPerigo.RANK_B);
         m.setOrganizacao(organizacaoBase);
         m.setDataCriacao(LocalDateTime.now());
+
         Missao salva = missaoRepository.save(m);
+
+        entityManager.flush();
+        entityManager.clear();
 
         Optional<Missao> resultado = missaoRepository.buscarMissaoComParticipantes(salva.getId());
 
@@ -81,10 +95,16 @@ class MissaoRepositoryTest {
         m.setNivelPerigo(NivelPerigo.RANK_C);
         m.setOrganizacao(organizacaoBase);
         m.setDataCriacao(LocalDateTime.now());
+
         missaoRepository.save(m);
 
+        entityManager.flush();
+        entityManager.clear();
+
         Page<MissaoMetricasDTO> relatorio = missaoRepository.relatorioMetricas(
-                null, null, PageRequest.of(0, 10)
+                null,
+                null,
+                PageRequest.of(0, 10)
         );
 
         assertThat(relatorio).isNotNull();
