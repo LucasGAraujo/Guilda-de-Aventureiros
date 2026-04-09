@@ -2,7 +2,9 @@ package org.example.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.domain.ENUM.ClasseAventureiro;
 import org.example.domain.audit.Organizacao;
@@ -14,6 +16,8 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "aventureiro", schema = "aventura")
 public class Aventureiro {
 
@@ -23,7 +27,6 @@ public class Aventureiro {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organizacao_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-
     private Organizacao organizacao;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -49,16 +52,15 @@ public class Aventureiro {
 
     @Column(name = "data_atualizacao")
     private LocalDateTime dataAtualizacao;
+
     @OneToOne(mappedBy = "aventureiro", cascade = CascadeType.ALL, orphanRemoval = true)
     private Companheiro companheiro;
+
     @OneToMany(mappedBy = "aventureiro", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ParticipacaoMissao> participacoes = new ArrayList<>();
-    public Aventureiro() {}
 
     @PrePersist
-    public void prePersist() {
-        this.dataCriacao = LocalDateTime.now();
-        this.dataAtualizacao = LocalDateTime.now();
+    public void prePersist() {this.dataCriacao = LocalDateTime.now(); this.dataAtualizacao = LocalDateTime.now();
     }
 
     @PreUpdate

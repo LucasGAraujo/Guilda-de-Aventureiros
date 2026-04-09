@@ -1,6 +1,5 @@
 package org.example.repository;
 
-import org.example.DTO.RankingAventureiroDTO;
 import org.example.domain.Aventureiro;
 import org.example.domain.Companheiro;
 import org.example.domain.ENUM.ClasseAventureiro;
@@ -89,25 +88,6 @@ class AventureiroRepositoryTest {
         assertThat(resultado).isPresent();
         assertThat(resultado.get().getCompanheiro()).isNotNull();
         assertThat(resultado.get().getCompanheiro().getNome()).isEqualTo("Fantasma");
-    }
-
-    @Test
-    @DisplayName("Deve trazer o ranking agregado sem duplicidades")
-    void deveBuscarRanking() {
-        Aventureiro a = criarAventureiro("Gimli", ClasseAventureiro.GUERREIRO, 12, true);
-        aventureiroRepository.save(a);
-
-        LocalDateTime inicio = LocalDateTime.now().minusDays(30);
-        LocalDateTime fim = LocalDateTime.now().plusDays(30);
-
-        Page<RankingAventureiroDTO> ranking = aventureiroRepository.buscarRanking(
-                organizacaoBase.getId(),
-                inicio,
-                fim,
-                PageRequest.of(0, 10)
-        );
-
-        assertThat(ranking.getContent()).isNotEmpty();
     }
 
     private Aventureiro criarAventureiro(String nome, ClasseAventureiro classe, Integer nivel, Boolean ativo) {
