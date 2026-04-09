@@ -1,58 +1,82 @@
 package org.example.service;
 
-import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
-import lombok.RequiredArgsConstructor;
 import org.example.domain.ProdutoLojaDocument;
 import org.example.DTO.AgregacaoCategoriaDTO;
 import org.example.DTO.ProdutoLojaResponseDTO;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
-import org.springframework.data.elasticsearch.client.elc.NativeQuery;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 public class GuildaLojaBuscaService {
-    private final ElasticsearchOperations elasticsearchOperations;
-    public List<ProdutoLojaResponseDTO> buscarProdutosPorTermo(String termo) {
-        var query = NativeQuery.builder()
-                .withQuery(q -> q.multiMatch(mm -> mm
-                        .fields("nome", "descricao", "categoria", "raridade")
-                        .query(termo)
-                ))
-                .build();
-        return converterParaDTO(elasticsearchOperations.search(query, ProdutoLojaDocument.class));
+
+    private final ElasticsearchClient client;
+    private final String INDEX_NAME = "guilda_loja";
+
+    public GuildaLojaBuscaService(ElasticsearchClient client) {
+        this.client = client;
     }
-    public List<ProdutoLojaResponseDTO> buscarPorNome(String termo) {
-        NativeQuery query = NativeQuery.builder()
-                .withQuery(q -> q.match(m -> m.field("nome").query(termo))).build();
-        return converterParaDTO(elasticsearchOperations.search(query, ProdutoLojaDocument.class));
+
+    public List<ProdutoLojaResponseDTO> buscarProdutosPorTermo(String termo) throws IOException {
+        SearchResponse<ProdutoLojaDocument> response = client.search(s -> s
+                .index(INDEX_NAME)
+                .query(q -> q
+                        .multiMatch(mm -> mm
+                                .fields("nome", "descricao", "categoria", "raridade")
+                                .query(termo)
+                        )
+                ), ProdutoLojaDocument.class
+        );
+        return converterparaDTO(response);
     }
-    public List<ProdutoLojaResponseDTO> buscarPorDescricao(String termo) {
-        NativeQuery query = NativeQuery.builder()
-                .withQuery(q -> q.match(m -> m.field("descricao").query(termo))).build();
-        return converterParaDTO(elasticsearchOperations.search(query, ProdutoLojaDocument.class));
+
+    public List<ProdutoLojaResponseDTO> buscarPorNome(String termo) throws IOException {
+        SearchResponse<ProdutoLojaDocument> response = client.search(s -> s
+                        .index(INDEX_NAME)
+                        .query(q -> q.match(m -> m.field("nome").query(termo))),
+                ProdutoLojaDocument.class
+        );
+        return converterparaDTO(response);
     }
-    public List<ProdutoLojaResponseDTO> buscarPorFraseExata(String frase) {
-        NativeQuery query = NativeQuery.builder()
-                .withQuery(q -> q.matchPhrase(m -> m.field("descricao").query(frase))).build();
-        return converterParaDTO(elasticsearchOperations.search(query, ProdutoLojaDocument.class));
+
+    public List<ProdutoLojaResponseDTO> buscarPorDescricao(String termo) throws IOException {
+        SearchResponse<ProdutoLojaDocument> response = client.search(s -> s
+                        .index(INDEX_NAME)
+                        .query(q -> q.match(m -> m.field("descricao").query(termo))),
+                ProdutoLojaDocument.class
+        );
+        return converterparaDTO(response);
     }
-    public List<ProdutoLojaResponseDTO> buscarFuzzy(String termo) {
-        NativeQuery query = NativeQuery.builder()
-                .withQuery(q -> q.match(m -> m.field("nome").query(termo).fuzziness("AUTO"))).build();
-        return converterParaDTO(elasticsearchOperations.search(query, ProdutoLojaDocument.class));
+
+    public List<ProdutoLojaResponseDTO> buscarPorFraseExata(String frase) throws IOException {
+        SearchResponse<ProdutoLojaDocument> response = client.search(s -> s
+                        .index(INDEX_NAME)
+                        .query(q -> q.matchPhrase(m -> m.field("descricao").query(frase))),
+                ProdutoLojaDocument.class
+        );
+        return converterparaDTO(response);
     }
-    public List<ProdutoLojaResponseDTO> buscarComFiltro(String termo, String categoria) {
-        var query = NativeQuery.builder()
-                .withQuery(q -> q.bool(b -> b
+
+    public List<ProdutoLojaResponseDTO> buscarFuzzy(String termo) throws IOException {
+        SearchResponse<ProdutoLojaDocument> response = client.search(s -> s
+                        .index(INDEX_NAME)
+                        .query(q -> q.match(m -> m.field("nome").query(termo).fuzziness("AUTO"))),
+                ProdutoLojaDocument.class
+        );
+        return converterparaDTO(response);
+    }
+
+    public List<ProdutoLojaResponseDTO> buscarComFiltro(String termo, String categoria) throws IOException {
+        SearchResponse<ProdutoLojaDocument> response = client.search(s -> s
+                .index(INDEX_NAME)
+                .query(q -> q.bool(b -> b
                         .must(m -> m.multiMatch(mm -> mm
                                 .fields("nome", "descricao")
                                 .query(termo)
@@ -61,83 +85,111 @@ public class GuildaLojaBuscaService {
                                 .field("categoria")
                                 .query(categoria)
                         ))
-                ))
-                .build();
-
-        return converterParaDTO(elasticsearchOperations.search(query, ProdutoLojaDocument.class));
+                )), ProdutoLojaDocument.class
+        );
+        return converterparaDTO(response);
     }
-    public List<ProdutoLojaResponseDTO> buscarPorFaixaDePreco(Double min, Double max) {
-        NativeQuery query = NativeQuery.builder()
-                .withQuery(q -> q.range(r -> r.field("preco")
+
+    public List<ProdutoLojaResponseDTO> buscarPorFaixaDePreco(Double min, Double max) throws IOException {
+        SearchResponse<ProdutoLojaDocument> response = client.search(s -> s
+                .index(INDEX_NAME)
+                .query(q -> q.range(r -> r
+                        .field("preco")
                         .gte(JsonData.of(min))
                         .lte(JsonData.of(max))
-                )).build();
-        return converterParaDTO(elasticsearchOperations.search(query, ProdutoLojaDocument.class));
+                )), ProdutoLojaDocument.class
+        );
+        return converterparaDTO(response);
     }
-    public List<ProdutoLojaResponseDTO> buscaAvancada(String categoria, String raridade, Double min, Double max) {
-        NativeQuery query = NativeQuery.builder()
-                .withQuery(q -> q.bool(b -> b
+
+    public List<ProdutoLojaResponseDTO> buscaAvancada(String categoria, String raridade, Double min, Double max) throws IOException {
+        SearchResponse<ProdutoLojaDocument> response = client.search(s -> s
+                .index(INDEX_NAME)
+                .query(q -> q.bool(b -> b
                         .filter(f -> f.term(t -> t.field("categoria").value(categoria)))
                         .filter(f -> f.term(t -> t.field("raridade").value(raridade)))
                         .filter(f -> f.range(r -> r.field("preco").gte(JsonData.of(min)).lte(JsonData.of(max))))
-                )).build();
-        return converterParaDTO(elasticsearchOperations.search(query, ProdutoLojaDocument.class));
+                )), ProdutoLojaDocument.class
+        );
+        return converterparaDTO(response);
     }
-    public List<AgregacaoCategoriaDTO> agruparPorRaridade() {
-        NativeQuery query = NativeQuery.builder()
-                .withAggregation("contagem_raridade", Aggregation.of(a -> a.terms(t -> t.field("raridade"))))
-                .build();
 
-        var hits = elasticsearchOperations.search(query, ProdutoLojaDocument.class);
-        var aggregate = ((ElasticsearchAggregations) hits.getAggregations())
-                .aggregationsAsMap().get("contagem_raridade").aggregation().getAggregate();
+    public List<AgregacaoCategoriaDTO> agruparPorRaridade() throws IOException {
+        SearchResponse<Void> response = client.search(s -> s
+                .index(INDEX_NAME)
+                .size(0)
+                .aggregations("contagem_raridade", a -> a
+                        .terms(t -> t.field("raridade"))
+                ), Void.class
+        );
 
-        return aggregate.sterms().buckets().array().stream()
+        return response.aggregations()
+                .get("contagem_raridade")
+                .sterms()
+                .buckets()
+                .array()
+                .stream()
                 .map(b -> new AgregacaoCategoriaDTO(b.key().stringValue(), b.docCount()))
                 .toList();
     }
-    public List<AgregacaoCategoriaDTO> agruparPorCategoria() {
-        var query = NativeQuery.builder()
-                .withAggregation("contagem_por_categoria", Aggregation.of(a -> a.terms(t -> t.field("categoria"))))
-                .build();
-        var hits = elasticsearchOperations.search(query, ProdutoLojaDocument.class);
-        var aggregate = ((ElasticsearchAggregations) hits.getAggregations())
-                .aggregationsAsMap().get("contagem_por_categoria").aggregation().getAggregate();
-        return aggregate.sterms().buckets().array().stream()
+
+    public List<AgregacaoCategoriaDTO> agruparPorCategoria() throws IOException {
+        SearchResponse<Void> response = client.search(s -> s
+                .index(INDEX_NAME)
+                .size(0)
+                .aggregations("contagem_por_categoria", a -> a
+                        .terms(t -> t.field("categoria"))
+                ), Void.class
+        );
+
+        return response.aggregations()
+                .get("contagem_por_categoria")
+                .sterms()
+                .buckets()
+                .array()
+                .stream()
                 .map(b -> new AgregacaoCategoriaDTO(b.key().stringValue(), b.docCount()))
                 .toList();
     }
-    public Map<String, Long> agruparFaixasPreco() {
-        var query = NativeQuery.builder()
-                .withAggregation("faixas", Aggregation.of(a -> a.range(r -> r.field("preco")
-                        .ranges(rg -> rg.to(JsonData.of(100).toString()))
-                        .ranges(rg -> rg.from(JsonData.of(100).toString()).to(JsonData.of(300).toString()))
-                        .ranges(rg -> rg.from(JsonData.of(300).toString()).to(JsonData.of(700).toString()))
-                        .ranges(rg -> rg.from(JsonData.of(700).toString()))
-                ))).build();
 
-        var hits = elasticsearchOperations.search(query, ProdutoLojaDocument.class);
-
-        var aggregate = ((ElasticsearchAggregations) hits.getAggregations())
-                .aggregationsAsMap().get("faixas").aggregation().getAggregate();
+    public Map<String, Long> agruparFaixasPreco() throws IOException {
+        SearchResponse<Void> response = client.search(s -> s
+                .index(INDEX_NAME)
+                .size(0)
+                .aggregations("faixas", a -> a
+                        .range(r -> r.field("preco")
+                                .ranges(rg -> rg.to("100.0"))
+                                .ranges(rg -> rg.from("100.0").to("300.0"))
+                                .ranges(rg -> rg.from("300.0").to("700.0"))
+                                .ranges(rg -> rg.from("700.0"))
+                        )
+                ), Void.class
+        );
 
         Map<String, Long> faixas = new HashMap<>();
-        aggregate.range().buckets().array().forEach(b -> faixas.put(b.key(), b.docCount()));
+        response.aggregations()
+                .get("faixas")
+                .range()
+                .buckets()
+                .array()
+                .forEach(b -> faixas.put(b.key(), b.docCount()));
 
         return faixas;
     }
-    private List<ProdutoLojaResponseDTO> converterParaDTO(SearchHits<ProdutoLojaDocument> hits) {
-        return hits.getSearchHits().stream()
+
+    private List<ProdutoLojaResponseDTO> converterparaDTO(SearchResponse<ProdutoLojaDocument> response) {
+        return response.hits().hits().stream()
                 .map(hit -> {
-                    ProdutoLojaDocument doc = hit.getContent();
-                    return new ProdutoLojaResponseDTO(
-                            doc.getId(),
+                    ProdutoLojaDocument doc = hit.source();
+                     return new ProdutoLojaResponseDTO(
+                            hit.id(),
                             doc.getNome(),
                             doc.getCategoria(),
                             doc.getRaridade(),
                             doc.getPreco(),
                             doc.getDescricao()
                     );
-                }).toList();
+                })
+                .toList();
     }
 }
