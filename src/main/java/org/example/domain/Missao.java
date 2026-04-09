@@ -1,7 +1,9 @@
 package org.example.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.domain.ENUM.NivelPerigo;
 import org.example.domain.ENUM.StatusMissao;
@@ -14,12 +16,16 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+
 @Table(name = "missao", schema = "aventura")
 public class Missao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organizacao_id", nullable = false,foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Organizacao organizacao;
@@ -47,7 +53,6 @@ public class Missao {
     @OneToMany(mappedBy = "missao", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ParticipacaoMissao> participacoes = new ArrayList<>();
 
-    public Missao() {}
 
     @PrePersist
     public void prePersist() {
