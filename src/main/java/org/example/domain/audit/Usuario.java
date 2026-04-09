@@ -1,7 +1,9 @@
 package org.example.domain.audit;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
@@ -12,6 +14,8 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "usuarios", schema = "audit")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,4 +50,16 @@ public class Usuario {
 
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = this.createdAt;
+        if (this.status == null) {
+            this.status = "ATIVO";
+        }
+    }
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = OffsetDateTime.now();
+    }
 }
