@@ -1,89 +1,85 @@
 package org.example.service;
 
+import org.example.DTO.AventureiroDTO;
 import org.example.domain.Aventureiro;
 import org.example.domain.ENUM.ClasseAventureiro;
-import org.example.exception.RecursoNaoEncontradoException;
-import org.example.exception.RegraNegocioException;
+import org.example.domain.audit.Organizacao;
+import org.example.domain.audit.Usuario;
+import org.example.exception.BusinessException;
 import org.example.repository.AventureiroRepository;
+import org.example.repository.audit.OrganizacaoRepository;
+import org.example.repository.audit.UsuarioRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
+@Transactional
 public class AventureiroService {
 
     private final AventureiroRepository aventureiroRepository;
+    private final OrganizacaoRepository organizacaoRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    public AventureiroService(AventureiroRepository aventureiroRepository) {
+    public AventureiroService(AventureiroRepository aventureiroRepository, OrganizacaoRepository organizacaoRepository, UsuarioRepository usuarioRepository) {
         this.aventureiroRepository = aventureiroRepository;
+        this.organizacaoRepository = organizacaoRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
-    public Aventureiro criar(Aventureiro aventureiro) {
-        if (aventureiro.getNome() == null || aventureiro.getNome().isBlank()) {
-            throw new RegraNegocioException("Nome do aventureiro é obrigatório");
-        }
-        if (aventureiro.getClasse() == null) {
-            throw new RegraNegocioException("Classe é obrigatória");
-        }
-        if (aventureiro.getNivel() == null || aventureiro.getNivel() < 1) {
-            throw new RegraNegocioException("Nível deve ser maior ou igual a 1");
-        }
-        if (aventureiro.getCompanheiro() != null) {
-            throw new RegraNegocioException("Não é permitido definir companheiro ao criar aventureiro");
-        }
+    public Page<Aventureiro> buscarComFiltros(Boolean status, ClasseAventureiro classe, Integer nivelMinimo, Pageable pageable) {
+        return aventureiroRepository.buscarAventureirosComFiltros(status, classe, nivelMinimo, pageable);
+    }
 
+    public Page<Aventureiro> buscarPorNome(String nome, Pageable pageable) {
+        return aventureiroRepository.findByNomeContainingIgnoreCase(nome, pageable);
+    }
+
+    public Optional<Aventureiro> buscarPerfilCompleto(Long id) {
+        return aventureiroRepository.buscarPerfilCompleto(id);
+    }
+
+    public Aventureiro salvar(AventureiroDTO.Create dto) {
+        Organizacao org = organizacaoRepository.findById(dto.organizacaoId())
+                .orElseThrow(() -> new BusinessException(
+                        HttpStatus.NOT_FOUND,
+                        "Organização não encontrada"
+                ));
+
+        Usuario usuario = usuarioRepository.findById(dto.usuarioCadastroId())
+                .orElseThrow(() -> new BusinessException(
+                        HttpStatus.NOT_FOUND,
+                        "Usuário não encontrado"
+                ));
+
+        if (!usuario.getOrganizacao().getId().equals(org.getId())) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Usuário não pertence a essa organização, tente outra organização"
+            );
+        }
+        Aventureiro aventureiro = new Aventureiro();
+        aventureiro.setNome(dto.nome());
+        aventureiro.setClasse(dto.classe());
+        aventureiro.setNivel(dto.nivel());
+        aventureiro.setOrganizacao(org);
+        aventureiro.setUsuarioCadastro(usuario);
         aventureiro.setAtivo(true);
 
         return aventureiroRepository.save(aventureiro);
     }
 
-    public List<Aventureiro> listar(ClasseAventureiro classe, Boolean ativo, Integer nivelMin) {
-        return aventureiroRepository.findAll().stream()
-                .filter(a -> classe == null || a.getClasse() == classe)
-                .filter(a -> ativo == null || a.getAtivo().equals(ativo))
-                .filter(a -> nivelMin == null || a.getNivel() >= nivelMin)
-                .sorted((a1, a2) -> a1.getId().compareTo(a2.getId()))
-                .collect(Collectors.toList());
-    }
-
-    public Aventureiro buscarPorId(Long id) {
-        return aventureiroRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Aventureiro não encontrado"));
-    }
-
-    public Aventureiro atualizar(Long id, Aventureiro dadosAtualizados) {
-        Aventureiro existente = buscarPorId(id);
-
-        if (dadosAtualizados.getNome() == null || dadosAtualizados.getNome().isBlank()) {
-            throw new RegraNegocioException("Nome não pode ser vazio");
+    public void deletar(Long id) {
+        if (!aventureiroRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aventureiro não encontrado");
         }
-        if (dadosAtualizados.getClasse() == null) {
-            throw new RegraNegocioException("Classe inválida ou não informada");
-        }
-        if (dadosAtualizados.getNivel() == null || dadosAtualizados.getNivel() < 1) {
-            throw new RegraNegocioException("Nível deve ser maior ou igual a 1");
-        }
-
-        existente.setNome(dadosAtualizados.getNome());
-        existente.setClasse(dadosAtualizados.getClasse());
-        existente.setNivel(dadosAtualizados.getNivel());
-
-        return aventureiroRepository.save(existente);
+        aventureiroRepository.deleteById(id);
     }
 
-    public Aventureiro encerrarVinculoGuilda(Long id) {
-        Aventureiro aventureiro = buscarPorId(id);
-        aventureiro.setAtivo(false);
-        return aventureiroRepository.save(aventureiro);
-    }
-
-    public Aventureiro recrutarNovamente(Long id) {
-        Aventureiro aventureiro = buscarPorId(id);
-        if (aventureiro.getAtivo()) {
-            throw new RegraNegocioException("O aventureiro já possui vínculo ativo com a guilda");
-        }
-        aventureiro.setAtivo(true);
-        return aventureiroRepository.save(aventureiro);
-    }
 }

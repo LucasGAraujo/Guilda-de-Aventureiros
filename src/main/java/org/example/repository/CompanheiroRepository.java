@@ -1,22 +1,10 @@
 package org.example.repository;
 
-import org.example.dataset.FakeDatabase;
 import org.example.domain.Companheiro;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public class CompanheiroRepository {
+import java.util.Optional;
 
-    public Companheiro save(Companheiro companheiro) {
-        if (companheiro.getId() == null) {
-            companheiro.setId(FakeDatabase.nextCompanheiroId++);
-        }
-        return companheiro;
-    }
-
-    public void delete(Companheiro companheiro) {
-        if (companheiro.getAventureiro() != null) {
-            companheiro.getAventureiro().setCompanheiro(null);
-        }
-    }
+public interface CompanheiroRepository extends JpaRepository<Companheiro, Long> {
+    Optional<Companheiro> findByAventureiroId(Long aventureiroId);
 }

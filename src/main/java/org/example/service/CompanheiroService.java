@@ -1,12 +1,17 @@
 package org.example.service;
 
+import org.example.DTO.CompanheiroDTO;
 import org.example.domain.Aventureiro;
 import org.example.domain.Companheiro;
-import org.example.exception.RecursoNaoEncontradoException;
-import org.example.exception.RegraNegocioException;
+import org.example.exception.BusinessException;
 import org.example.repository.AventureiroRepository;
 import org.example.repository.CompanheiroRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
 
 @Service
 public class CompanheiroService {
@@ -19,50 +24,40 @@ public class CompanheiroService {
         this.aventureiroRepository = aventureiroRepository;
     }
 
-    public Companheiro definirOuSubstituir(Long aventureiroId, Companheiro dados) {
+    @Transactional
+    public Companheiro salvar(Long aventureiroId, CompanheiroDTO.Request dto) {
         Aventureiro aventureiro = aventureiroRepository.findById(aventureiroId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Aventureiro não encontrado"));
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Aventureiro não encontrado"));
 
-        if (dados.getNome() == null || dados.getNome().isBlank()) {
-            throw new RegraNegocioException("Nome do companheiro é obrigatório");
-        }
-        if (dados.getEspecie() == null) {
-            throw new RegraNegocioException("Espécie do companheiro é obrigatória ou inválida");
-        }
-        if (dados.getLealdade() == null || dados.getLealdade() < 0 || dados.getLealdade() > 100) {
-            throw new RegraNegocioException("A lealdade deve estar entre 0 e 100");
+        Optional<Companheiro> existing = companheiroRepository.findByAventureiroId(aventureiroId);
+        if (existing.isPresent()) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Aventureiro já possui um companheiro");
         }
 
-        Companheiro companheiro = aventureiro.getCompanheiro();
+        Companheiro companheiro = new Companheiro();
+        companheiro.setNome(dto.nome());
+        companheiro.setEspecie(dto.especie());
+        companheiro.setLealdade(dto.lealdade());
+        companheiro.setAventureiro(aventureiro);
 
-        if (companheiro == null) {
-            companheiro = new Companheiro();
-            companheiro.setAventureiro(aventureiro);
-        }
-
-        companheiro.setNome(dados.getNome());
-        companheiro.setEspecie(dados.getEspecie());
-        companheiro.setLealdade(dados.getLealdade());
-
-        companheiro = companheiroRepository.save(companheiro);
-        aventureiro.setCompanheiro(companheiro);
-        aventureiroRepository.save(aventureiro);
-
-        return companheiro;
+        return companheiroRepository.save(companheiro);
     }
 
-    public void deletarCompanheiroDoAventureiro(Long aventureiroId) {
-        Aventureiro aventureiro = aventureiroRepository.findById(aventureiroId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Aventureiro não encontrado"));
+    @Transactional
+    public Companheiro atualizarCompanheiro(Long companheiroId, CompanheiroDTO.Request dto) {
+        Companheiro companheiro = companheiroRepository.findById(companheiroId)
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Companheiro não encontrado"));
+        companheiro.setNome(dto.nome());
+        companheiro.setEspecie(dto.especie());
+        companheiro.setLealdade(dto.lealdade());
 
-        Companheiro companheiro = aventureiro.getCompanheiro();
+        return companheiroRepository.save(companheiro);
+    }
 
-        if (companheiro == null) {
-            throw new RecursoNaoEncontradoException("Este aventureiro não possui um companheiro para remover");
-        }
-
-        aventureiro.setCompanheiro(null);
+    @Transactional
+    public void removerCompanheiro(Long companheiroId) {
+        Companheiro companheiro = companheiroRepository.findById(companheiroId)
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Companheiro não encontrado"));
         companheiroRepository.delete(companheiro);
-        aventureiroRepository.save(aventureiro);
     }
 }
