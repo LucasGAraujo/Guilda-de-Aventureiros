@@ -2,7 +2,9 @@ package org.example.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.domain.ENUM.PapelMissao;
 
@@ -15,7 +17,10 @@ import java.time.LocalDateTime;
 @Table(name = "participacao_missao", schema = "aventura",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"missao_id", "aventureiro_id"})
-        })public class ParticipacaoMissao {
+        })
+@AllArgsConstructor
+@NoArgsConstructor
+public class ParticipacaoMissao {
 
     @EmbeddedId
     private ParticipacaoMissaoId id;
@@ -43,8 +48,6 @@ import java.time.LocalDateTime;
 
     @Column(name = "data_registro", updatable = false)
     private LocalDateTime dataRegistro;
-
-    public ParticipacaoMissao() {}
 
     @PrePersist
     public void prePersist() {

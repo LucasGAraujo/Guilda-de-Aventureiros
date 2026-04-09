@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface ParticipacaoMissaoRepository extends JpaRepository<ParticipacaoMissao, ParticipacaoMissaoId> {
     boolean existsByMissaoIdAndAventureiroId(Long missaoId, Long aventureiroId);
+    List<ParticipacaoMissao> findByIdMissaoId(Long missaoId);
 }
