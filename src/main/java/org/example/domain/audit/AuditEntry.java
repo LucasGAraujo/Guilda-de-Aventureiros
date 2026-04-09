@@ -1,7 +1,9 @@
 package org.example.domain.audit;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
@@ -10,6 +12,8 @@ import java.time.OffsetDateTime;
 @Setter
 @Entity
 @Table(name = "audit_entries", schema = "audit")
+@AllArgsConstructor
+@NoArgsConstructor
 public class AuditEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

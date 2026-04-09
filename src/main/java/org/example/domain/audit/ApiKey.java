@@ -1,13 +1,17 @@
 package org.example.domain.audit;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "api_keys", schema = "audit")
+@AllArgsConstructor
+@NoArgsConstructor
 public class ApiKey {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
