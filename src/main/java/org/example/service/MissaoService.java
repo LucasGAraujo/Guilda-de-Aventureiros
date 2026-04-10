@@ -1,7 +1,6 @@
 package org.example.service;
 
 import org.example.DTO.MissaoDTO;
-import org.example.DTO.MissaoMetricasDTO;
 import org.example.domain.ENUM.NivelPerigo;
 import org.example.domain.ENUM.StatusMissao;
 import org.example.domain.Missao;
@@ -14,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -52,7 +50,32 @@ public class MissaoService {
         missao.setStatus(StatusMissao.PLANEJADA);
         return missaoRepository.save(missao);
     }
-
+    public Missao iniciarMissao(Long id) {
+        Missao missao = missaoRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Missão não encontrada"));
+        if (missao.getStatus() != StatusMissao.PLANEJADA) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST,
+                    "Apenas missões planejadas podem ser iniciadas");
+        }
+        missao.setStatus(StatusMissao.EM_ANDAMENTO);
+        return missaoRepository.save(missao);
+    }
+    public Missao cancelarMissao(Long id) {
+        Missao missao = missaoRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Missão não encontrada"));
+        missao.setStatus(StatusMissao.CANCELADA);
+        return missaoRepository.save(missao);
+    }
+    public Missao concluirMissao(Long id) {
+        Missao missao = missaoRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Missão não encontrada"));
+        if (missao.getStatus() != StatusMissao.EM_ANDAMENTO) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST,
+                    "Apenas missões Iniciadas podem ser concluidas");
+        }
+        missao.setStatus(StatusMissao.CONCLUIDA);
+        return missaoRepository.save(missao);
+    }
     public void deletar(Long id) {
         missaoRepository.deleteById(id);
     }

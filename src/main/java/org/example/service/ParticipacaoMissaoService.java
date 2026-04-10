@@ -34,6 +34,12 @@ public class ParticipacaoMissaoService {
                     "Aventureiro não pertence à mesma organização da missão"
             );
         }
+        if(!aventureiro.getAtivo()) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "O Aventureiro não esta ativo"
+            );
+        }
 
         ParticipacaoMissao participacao = new ParticipacaoMissao();
         participacao.setId(new ParticipacaoMissaoId(dto.missaoId(), dto.aventureiroId()));
