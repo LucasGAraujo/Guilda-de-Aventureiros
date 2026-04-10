@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.DTO.MissaoDTO;
 import org.example.domain.ENUM.NivelPerigo;
 import org.example.domain.ENUM.StatusMissao;
@@ -7,6 +8,7 @@ import org.example.domain.Missao;
 import org.example.service.MissaoService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,13 +17,12 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/missoes")
+@RequiredArgsConstructor
+
 public class MissaoController {
 
     private final MissaoService missaoService;
 
-    public MissaoController(MissaoService missaoService) {
-        this.missaoService = missaoService;
-    }
 
 
     @GetMapping("/filtros")
@@ -30,7 +31,7 @@ public class MissaoController {
             @RequestParam(required = false) NivelPerigo nivelPerigo,
             @RequestParam(required = false) LocalDateTime dataInicio,
             @RequestParam(required = false) LocalDateTime dataFim,
-            Pageable pageable
+            @PageableDefault(page = 0, size = 10) Pageable pageable
     ) {
         return ResponseEntity.ok(missaoService.listarMissoes(status, nivelPerigo, dataInicio, dataFim, pageable));
     }

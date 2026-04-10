@@ -1,5 +1,6 @@
-package org.example.controller;
+package org.example.controller.elastic;
 
+import lombok.RequiredArgsConstructor;
 import org.example.DTO.AgregacaoCategoriaDTO;
 import org.example.DTO.ProdutoLojaResponseDTO;
 import org.example.service.GuildaLojaBuscaService;
@@ -11,13 +12,9 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/produtos")
+@RequiredArgsConstructor
 public class GuildaLojaController {
-
     private final GuildaLojaBuscaService guildaservice;
-
-    public GuildaLojaController(GuildaLojaBuscaService service) {
-        this.guildaservice = service;
-    }
 
     @GetMapping("/busca")
     public List<ProdutoLojaResponseDTO> buscar(@RequestParam String termo) throws IOException {
