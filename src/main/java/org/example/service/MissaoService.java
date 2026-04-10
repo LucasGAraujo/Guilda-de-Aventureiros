@@ -28,10 +28,21 @@ public class MissaoService {
         this.organizacaoRepository = organizacaoRepository;
     }
 
-    public Page<Missao> listarMissoes(StatusMissao status, NivelPerigo nivelPerigo,
-                                      LocalDateTime dataInicio, LocalDateTime dataFim,
-                                      Pageable pageable) {
-        return missaoRepository.listarMissoes(status, nivelPerigo, dataInicio, dataFim, pageable);
+    public Page<MissaoDTO.Response> listarMissoes(
+            StatusMissao status,
+            NivelPerigo nivelPerigo,
+            LocalDateTime dataInicio,
+            LocalDateTime dataFim,
+            Pageable pageable
+    ) {
+        return missaoRepository.listarMissoes(status, nivelPerigo, dataInicio, dataFim, pageable)
+                .map(m -> new MissaoDTO.Response(
+                        m.getId(),
+                        m.getTitulo(),
+                        m.getNivelPerigo(),
+                        m.getStatus(),
+                        m.getOrganizacao().getNome()
+                ));
     }
 
     public Optional<Missao> buscarMissaoComParticipantes(Long id) {
