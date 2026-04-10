@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 
-@Table(name = "missao", schema = "aventura")
+@Table(name = "missao", schema = "operacoes")
 public class Missao {
 
     @Id

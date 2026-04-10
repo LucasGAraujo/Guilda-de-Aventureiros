@@ -12,7 +12,7 @@ import org.example.domain.ENUM.ClasseEspecie;
 @Getter
 @Setter
 @Entity
-@Table(name = "companheiro", schema = "aventura")
+@Table(name = "companheiro", schema = "operacoes")
 @AllArgsConstructor
 @NoArgsConstructor
 
