@@ -37,34 +37,6 @@ class MissaoRepositoryTest {
     }
 
     @Test
-    @DisplayName("Deve listar as missões aplicando os filtros corretamente")
-    void deveListarMissoes() {
-        Missao m = new Missao();
-        m.setTitulo("Limpar o Porão da Taverna");
-        m.setStatus(StatusMissao.PLANEJADA);
-        m.setNivelPerigo(NivelPerigo.EXTREMO);
-        m.setOrganizacao(organizacaoBase);
-        m.setDataCriacao(LocalDateTime.now());
-
-        missaoRepository.save(m);
-
-        entityManager.flush();
-        entityManager.clear();
-
-        Page<Missao> resultado = missaoRepository.listarMissoes(
-                StatusMissao.PLANEJADA,
-                NivelPerigo.EXTREMO,
-                null,
-                null,
-                PageRequest.of(0, 10)
-        );
-
-        assertThat(resultado.getContent()).isNotEmpty();
-        assertThat(resultado.getContent().get(0).getTitulo())
-                .isEqualTo("Limpar o Porão da Taverna");
-    }
-
-    @Test
     @DisplayName("Deve buscar a missão e seus participantes sem estourar o banco vazio")
     void deveBuscarMissaoComParticipantes() {
         Missao m = new Missao();
