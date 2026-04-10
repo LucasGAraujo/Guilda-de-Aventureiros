@@ -1,10 +1,8 @@
 package org.example.domain.audit;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
 
 @Getter
 @Setter
@@ -14,10 +12,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Permission {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "permission_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "permissions_id")
     @SequenceGenerator(
-            name = "permission_id",
-            sequenceName = "permission_id_seq",
+            name = "permissions_id",
+            sequenceName = "permissions_id_seq",
             schema = "audit",
             allocationSize = 1
     )

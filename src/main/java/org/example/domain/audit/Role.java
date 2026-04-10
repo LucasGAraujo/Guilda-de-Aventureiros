@@ -1,10 +1,8 @@
 package org.example.domain.audit;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,10 +15,10 @@ import java.util.Set;
 @NoArgsConstructor
 public class Role {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "roles_id")
     @SequenceGenerator(
-            name = "role_id",
-            sequenceName = "role_id_seq",
+            name = "roles_id",
+            sequenceName = "roles_id_seq",
             schema = "audit",
             allocationSize = 1
     )
