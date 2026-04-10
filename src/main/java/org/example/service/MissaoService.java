@@ -28,17 +28,28 @@ public class MissaoService {
         this.organizacaoRepository = organizacaoRepository;
     }
 
-    public Page<Missao> listarMissoes(StatusMissao status, NivelPerigo nivelPerigo,
-                                      LocalDateTime dataInicio, LocalDateTime dataFim,
-                                      Pageable pageable) {
-        return missaoRepository.listarMissoes(status, nivelPerigo, dataInicio, dataFim, pageable);
+    public Page<MissaoDTO.Response> listarMissoes(
+            StatusMissao status,
+            NivelPerigo nivelPerigo,
+            LocalDateTime dataInicio,
+            LocalDateTime dataFim,
+            Pageable pageable
+    ) {
+        return missaoRepository.listarMissoes(status, nivelPerigo, dataInicio, dataFim, pageable)
+                .map(m -> new MissaoDTO.Response(
+                        m.getId(),
+                        m.getTitulo(),
+                        m.getNivelPerigo(),
+                        m.getStatus(),
+                        m.getOrganizacao().getNome()
+                ));
     }
 
     public Optional<Missao> buscarMissaoComParticipantes(Long id) {
         return missaoRepository.buscarMissaoComParticipantes(id);
     }
 
-    public Missao salvar(MissaoDTO.Create dto) {
+    public MissaoDTO.Response salvar(MissaoDTO.Create dto) {
         Organizacao org = organizacaoRepository.findById(dto.organizacaoId())
                 .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Organização não encontrada"));
         Missao missao = new Missao();
@@ -48,7 +59,15 @@ public class MissaoService {
         missao.setDataInicio(dto.dataInicio());
         missao.setDataFim(dto.dataFim());
         missao.setStatus(StatusMissao.PLANEJADA);
-        return missaoRepository.save(missao);
+        missao = missaoRepository.save(missao);
+
+        return new MissaoDTO.Response(
+                missao.getId(),
+                missao.getTitulo(),
+                missao.getNivelPerigo(),
+                missao.getStatus(),
+                org.getNome()
+        );
     }
     public Missao iniciarMissao(Long id) {
         Missao missao = missaoRepository.findById(id)

@@ -25,7 +25,7 @@ public class MissaoController {
 
 
     @GetMapping("/filtros")
-    public ResponseEntity<Page<Missao>> listarMissoes(
+    public ResponseEntity<Page<MissaoDTO.Response>> listarMissoes(
             @RequestParam(required = false) StatusMissao status,
             @RequestParam(required = false) NivelPerigo nivelPerigo,
             @RequestParam(required = false) LocalDateTime dataInicio,
@@ -35,7 +35,6 @@ public class MissaoController {
         return ResponseEntity.ok(missaoService.listarMissoes(status, nivelPerigo, dataInicio, dataFim, pageable));
     }
 
-
     @GetMapping("/{id}/participantes")
     public ResponseEntity<MissaoDTO.Detalhe> listarMissaoComParticipantes(@PathVariable Long id) {
         return missaoService.buscarMissaoComParticipantes(id)
@@ -44,6 +43,7 @@ public class MissaoController {
                             .map(p -> new MissaoDTO.ParticipanteResumo(
                                     p.getAventureiro().getNome(),
                                     p.getRecompensaOuro(),
+                                    p.getPapel(),
                                     p.getDestaque()))
                             .toList();
 
@@ -52,6 +52,9 @@ public class MissaoController {
                             m.getTitulo(),
                             m.getNivelPerigo(),
                             m.getStatus(),
+                            m.getDataInicio(),
+                            m.getDataFim(),
+                            m.getOrganizacao().getNome(),
                             participantes
                     );
                     return ResponseEntity.ok(detalhe);
@@ -61,17 +64,9 @@ public class MissaoController {
 
     @PostMapping
     public ResponseEntity<MissaoDTO.Response> criar(@RequestBody MissaoDTO.Create dto) {
-        Missao salva = missaoService.salvar(dto);
+        MissaoDTO.Response salva = missaoService.salvar(dto);
 
-        MissaoDTO.Response response = new MissaoDTO.Response(
-                salva.getId(),
-                salva.getTitulo(),
-                salva.getNivelPerigo(),
-                salva.getStatus(),
-                salva.getOrganizacao().getNome()
-        );
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(salva);
     }
 
     @PatchMapping("/{id}/iniciar")

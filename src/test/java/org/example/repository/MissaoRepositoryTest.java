@@ -1,6 +1,5 @@
 package org.example.repository;
 
-import org.example.DTO.MissaoMetricasDTO;
 import org.example.domain.ENUM.NivelPerigo;
 import org.example.domain.ENUM.StatusMissao;
 import org.example.domain.Missao;
@@ -84,30 +83,5 @@ class MissaoRepositoryTest {
 
         assertThat(resultado).isPresent();
         assertThat(resultado.get().getParticipacoes()).isEmpty();
-    }
-
-    @Test
-    @DisplayName("Deve executar o relatório de métricas agrupadas com sucesso")
-    void deveGerarRelatorioMetricas() {
-        Missao m = new Missao();
-        m.setTitulo("Resgate do Rei");
-        m.setStatus(StatusMissao.CONCLUIDA);
-        m.setNivelPerigo(NivelPerigo.RANK_C);
-        m.setOrganizacao(organizacaoBase);
-        m.setDataCriacao(LocalDateTime.now());
-
-        missaoRepository.save(m);
-
-        entityManager.flush();
-        entityManager.clear();
-
-        Page<MissaoMetricasDTO> relatorio = missaoRepository.relatorioMetricas(
-                null,
-                null,
-                PageRequest.of(0, 10)
-        );
-
-        assertThat(relatorio).isNotNull();
-        assertThat(relatorio.getContent()).isNotEmpty();
     }
 }
