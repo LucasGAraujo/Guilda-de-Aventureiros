@@ -20,4 +20,8 @@ public class PainelTaticoMissaoController {
     public ResponseEntity<List<MissaoTop15DiasResponseDTO>> buscarTop10MissoesUltimos15Dias() {
         return ResponseEntity.ok(service.buscarTop10MissoesUltimos15Dias());
     }
+    @GetMapping("/top15diasFuturos")
+    public ResponseEntity<List<MissaoTop15DiasResponseDTO>> buscarTop10MissoesUltimos15DiasFuturos() {
+        return ResponseEntity.ok(service.buscarTop10MissoesFuturas());
+    }
 }

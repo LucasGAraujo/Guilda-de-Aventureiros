@@ -12,12 +12,17 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PainelTaticoMissaoService {
+
     private final PainelTaticoMissaoRepository repository;
+
     @Cacheable(value = "rankingMissoes")
     public List<MissaoTop15DiasResponseDTO> buscarTop10MissoesUltimos15Dias() {
-        LocalDateTime dataLimite = LocalDateTime.now().minusDays(15);
-        List<MissaoTop15DiasResponseDTO> result = repository
-                .findTop10ByUltimaAtualizacaoGreaterThanEqualOrderByIndiceProntidaoDesc(dataLimite)
+
+        LocalDateTime datainicio = LocalDateTime.now().minusDays(15);
+        LocalDateTime datafim = LocalDateTime.now();
+
+        return repository
+                .findTop10ByUltimaAtualizacaoBetweenOrderByIndiceProntidaoDesc(datainicio, datafim)
                 .stream()
                 .map(missao -> new MissaoTop15DiasResponseDTO(
                         missao.getMissaoId(),
@@ -34,6 +39,30 @@ public class PainelTaticoMissaoService {
                         missao.getIndiceProntidao()
                 ))
                 .toList();
-        return result;
+    }
+
+    @Cacheable(value = "rankingMissoesFuturo")
+    public List<MissaoTop15DiasResponseDTO> buscarTop10MissoesFuturas() {
+
+        LocalDateTime datainicio = LocalDateTime.now().minusDays(15);
+
+        return repository
+                .findTop10ByUltimaAtualizacaoGreaterThanEqualOrderByIndiceProntidaoDesc(datainicio)
+                .stream()
+                .map(missao -> new MissaoTop15DiasResponseDTO(
+                        missao.getMissaoId(),
+                        missao.getTitulo(),
+                        missao.getStatus(),
+                        missao.getNivelPerigo(),
+                        missao.getOrganizacaoId(),
+                        missao.getTotalParticipantes(),
+                        missao.getNivelMedioEquipe(),
+                        missao.getTotalRecompensa(),
+                        missao.getTotalMvps(),
+                        missao.getParticipantesComCompanheiro(),
+                        missao.getUltimaAtualizacao(),
+                        missao.getIndiceProntidao()
+                ))
+                .toList();
     }
 }

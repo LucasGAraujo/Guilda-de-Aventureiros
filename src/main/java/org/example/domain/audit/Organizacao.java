@@ -1,10 +1,7 @@
 package org.example.domain.audit;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.OffsetDateTime;
 
@@ -17,10 +14,10 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 public class Organizacao {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "org_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "organizacoes_id")
     @SequenceGenerator(
-            name = "org_id",
-            sequenceName = "org_id_seq",
+            name = "organizacoes_id",
+            sequenceName = "organizacoes_id_seq",
             schema = "audit",
             allocationSize = 1
     )
