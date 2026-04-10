@@ -49,7 +49,7 @@ public class MissaoService {
         return missaoRepository.buscarMissaoComParticipantes(id);
     }
 
-    public Missao salvar(MissaoDTO.Create dto) {
+    public MissaoDTO.Response salvar(MissaoDTO.Create dto) {
         Organizacao org = organizacaoRepository.findById(dto.organizacaoId())
                 .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Organização não encontrada"));
         Missao missao = new Missao();
@@ -59,7 +59,15 @@ public class MissaoService {
         missao.setDataInicio(dto.dataInicio());
         missao.setDataFim(dto.dataFim());
         missao.setStatus(StatusMissao.PLANEJADA);
-        return missaoRepository.save(missao);
+        missao = missaoRepository.save(missao);
+
+        return new MissaoDTO.Response(
+                missao.getId(),
+                missao.getTitulo(),
+                missao.getNivelPerigo(),
+                missao.getStatus(),
+                org.getNome()
+        );
     }
     public Missao iniciarMissao(Long id) {
         Missao missao = missaoRepository.findById(id)

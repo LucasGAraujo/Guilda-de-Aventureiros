@@ -64,17 +64,9 @@ public class MissaoController {
 
     @PostMapping
     public ResponseEntity<MissaoDTO.Response> criar(@RequestBody MissaoDTO.Create dto) {
-        Missao salva = missaoService.salvar(dto);
+        MissaoDTO.Response salva = missaoService.salvar(dto);
 
-        MissaoDTO.Response response = new MissaoDTO.Response(
-                salva.getId(),
-                salva.getTitulo(),
-                salva.getNivelPerigo(),
-                salva.getStatus(),
-                salva.getOrganizacao().getNome()
-        );
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(salva);
     }
 
     @PatchMapping("/{id}/iniciar")
