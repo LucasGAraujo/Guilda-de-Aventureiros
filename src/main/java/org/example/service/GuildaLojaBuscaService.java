@@ -2,7 +2,6 @@ package org.example.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import org.example.domain.ProdutoLojaDocument;
 import org.example.DTO.AgregacaoCategoriaDTO;

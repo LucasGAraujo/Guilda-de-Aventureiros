@@ -56,10 +56,4 @@ public class OrganizacaoController {
         );
         return code200;
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        organizacaoService.deletar(id);
-        return ResponseEntity.noContent().build();
-    }
 }

@@ -7,7 +7,6 @@ import org.example.exception.BusinessException;
 import org.example.repository.audit.OrganizacaoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,12 +43,5 @@ public class OrganizacaoService {
         if (dto.ativo() != null) organizacao.setAtivo(dto.ativo());
 
         return organizacaoRepository.save(organizacao);
-    }
-
-    public void deletar(Long id) {
-        if (!organizacaoRepository.existsById(id)) {
-            throw new BusinessException(HttpStatus.NOT_FOUND, "Organização não encontrada");
-        }
-        organizacaoRepository.deleteById(id);
     }
 }

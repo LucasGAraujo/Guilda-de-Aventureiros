@@ -6,7 +6,6 @@ import org.example.domain.Missao;
 import org.example.domain.ParticipacaoMissao;
 import org.example.domain.ParticipacaoMissaoId;
 import org.example.exception.BusinessException;
-import org.example.repository.AventureiroRepository;
 import org.example.repository.ParticipacaoMissaoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -32,6 +31,12 @@ public class ParticipacaoMissaoService {
             throw new BusinessException(
                     HttpStatus.BAD_REQUEST,
                     "Aventureiro não pertence à mesma organização da missão"
+            );
+        }
+        if(!aventureiro.getAtivo()) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "O Aventureiro não esta ativo"
             );
         }
 
