@@ -14,15 +14,4 @@ public class AventureiroApplication {
     public static void main(String[] args) {
         SpringApplication.run(AventureiroApplication.class, args);
     }
-
-    @Bean
-    CommandLineRunner testarCache(PainelTaticoMissaoService service) {
-        return args -> {
-            System.out.println(" CHAMADA 1 (Vai no banco):");
-            service.buscarTop10MissoesUltimos15Dias();
-
-            System.out.println(" CHAMADA 2 (Tem que vir do cache):");
-            service.buscarTop10MissoesUltimos15Dias();
-        };
-    }
 }
