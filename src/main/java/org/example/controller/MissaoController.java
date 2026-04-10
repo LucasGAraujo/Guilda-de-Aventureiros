@@ -25,7 +25,7 @@ public class MissaoController {
 
 
     @GetMapping("/filtros")
-    public ResponseEntity<Page<Missao>> listarMissoes(
+    public ResponseEntity<Page<MissaoDTO.Response>> listarMissoes(
             @RequestParam(required = false) StatusMissao status,
             @RequestParam(required = false) NivelPerigo nivelPerigo,
             @RequestParam(required = false) LocalDateTime dataInicio,
