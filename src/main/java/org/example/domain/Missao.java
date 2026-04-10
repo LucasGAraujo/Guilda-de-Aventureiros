@@ -23,7 +23,13 @@ import java.util.List;
 public class Missao {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "missao_id")
+    @SequenceGenerator(
+            name = "missao_id",
+            sequenceName = "missao_id_seq",
+            schema = "audit",
+            allocationSize = 1
+    )
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.DTO.ParticipacaoMissaoDTO;
 import org.example.domain.Aventureiro;
 import org.example.domain.ENUM.StatusMissao;
@@ -16,28 +17,24 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/participacoes")
+@RequiredArgsConstructor
+
 public class ParticipacaoMissaoController {
 
     private final ParticipacaoMissaoService participacaoService;
     private final MissaoRepository missaoRepository;
     private final AventureiroRepository aventureiroRepository;
-    public ParticipacaoMissaoController(ParticipacaoMissaoService participacaoService, MissaoRepository missaoRepository, AventureiroRepository aventureiroRepository) {
-        this.participacaoService = participacaoService;
-        this.missaoRepository = missaoRepository;
-        this.aventureiroRepository = aventureiroRepository;
-    }
 
 
     @PostMapping
     public ResponseEntity<ParticipacaoMissaoDTO.Response> criar(@RequestBody ParticipacaoMissaoDTO.Create dto) {
         Missao missao = missaoRepository.findById(dto.missaoId())
-                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Missão não encontrada"));
+                .orElseThrow(() -> new BusinessException( "Missão não encontrada"));
         Aventureiro aventureiro = aventureiroRepository.findById(dto.aventureiroId())
-                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Aventureiro não encontrado"));
+                .orElseThrow(() -> new BusinessException( "Aventureiro não encontrado"));
         if (missao.getStatus() == StatusMissao.CANCELADA ||
                 missao.getStatus() == StatusMissao.CONCLUIDA) {
             throw new BusinessException(
-                    HttpStatus.BAD_REQUEST,
                     "Não é possível adicionar participantes em missões canceladas ou concluídas"
             );
         }
@@ -60,7 +57,7 @@ public class ParticipacaoMissaoController {
             @RequestParam Long missaoId,
             @RequestParam Long aventureiroId
     ) {
-        participacaoService.removerParticipacao(missaoId, aventureiroId);
+        participacaoService.deletar(missaoId, aventureiroId);
         return ResponseEntity.noContent().build();
     }
 }

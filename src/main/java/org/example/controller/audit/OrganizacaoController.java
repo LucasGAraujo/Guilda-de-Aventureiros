@@ -42,18 +42,4 @@ public class OrganizacaoController {
                 ))
                 .orElse(ResponseEntity.notFound().build());
     }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<OrganizacaoDTO.Response> atualizar(@PathVariable Long id, @RequestBody OrganizacaoDTO.Update dto) {
-        Organizacao atualizada = organizacaoService.atualizar(id, dto);
-        ResponseEntity<OrganizacaoDTO.Response> code200 = ResponseEntity.ok(
-                new OrganizacaoDTO.Response(
-                        atualizada.getId(),
-                        atualizada.getNome(),
-                        atualizada.isAtivo(),
-                        atualizada.getCreatedAt()
-                )
-        );
-        return code200;
-    }
 }

@@ -18,7 +18,7 @@ public class RoleController {
 
     @GetMapping("/organizacao/{id}")
     public ResponseEntity<List<RoleDTO.Response>> listarRolePorOrganizacao(@PathVariable Long id) {
-        List<RoleDTO.Response> lista = roleService.findAllByOrganizacaoId(id).stream()
+        List<RoleDTO.Response> lista = roleService.buscarTodasOrgPorId(id).stream()
                 .map(role -> new RoleDTO.Response(
                                 role.getId(),
                                 role.getNome(),
@@ -32,7 +32,7 @@ public class RoleController {
 
     @GetMapping("/{id}")
     public ResponseEntity<RoleDTO.Response> listarRole(@PathVariable Long id) {
-        return roleService.findById(id)
+        return roleService.buscarPorId(id)
                 .map(role -> ResponseEntity.ok(
                         new RoleDTO.Response(
                                 role.getId(),
@@ -47,7 +47,7 @@ public class RoleController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        roleService.deleteById(id);
+        roleService.deletar(id);
         return ResponseEntity.noContent().build();
     }
     }
