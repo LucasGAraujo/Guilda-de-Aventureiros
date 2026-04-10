@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.DTO.CompanheiroDTO;
 import org.example.domain.Companheiro;
 import org.example.service.CompanheiroService;
@@ -9,13 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/companheiros")
+@RequiredArgsConstructor
 public class CompanheiroController {
 
     private final CompanheiroService companheiroService;
 
-    public CompanheiroController(CompanheiroService companheiroService) {
-        this.companheiroService = companheiroService;
-    }
 
     @PostMapping("/aventureiro/{aventureiroId}")
     public ResponseEntity<CompanheiroDTO.Response> criar(
@@ -40,7 +39,7 @@ public class CompanheiroController {
             @PathVariable Long companheiroId,
             @RequestBody CompanheiroDTO.Request dto) {
 
-        Companheiro atualizado = companheiroService.atualizarCompanheiro(companheiroId, dto);
+        Companheiro atualizado = companheiroService.atualizar(companheiroId, dto);
 
         return ResponseEntity.ok(
                 new CompanheiroDTO.Response(
@@ -55,7 +54,7 @@ public class CompanheiroController {
 
     @DeleteMapping("/{companheiroId}")
     public ResponseEntity<Void> deletar(@PathVariable Long companheiroId) {
-        companheiroService.removerCompanheiro(companheiroId);
+        companheiroService.deletar(companheiroId);
         return ResponseEntity.noContent().build();
     }
 }

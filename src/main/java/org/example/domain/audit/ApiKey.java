@@ -14,7 +14,13 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ApiKey {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "keys_id")
+    @SequenceGenerator(
+            name = "keys_id",
+            sequenceName = "keys_id_seq",
+            schema = "audit",
+            allocationSize = 1
+    )
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,8 +1,12 @@
 package org.example.controller.audit;
 
+import lombok.RequiredArgsConstructor;
 import org.example.domain.audit.Usuario;
 import org.example.DTO.audit.UsuarioDTO;
 import org.example.service.audit.UsuarioService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,16 +16,16 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/usuarios")
+@RequiredArgsConstructor
+
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
-    public UsuarioController(UsuarioService usuarioService) {
-        this.usuarioService = usuarioService;
-    }
+
 
     @GetMapping("/organizacao/{id}")
     public ResponseEntity<List<UsuarioDTO.Response>> listarUsuarioPorOrganizacao(@PathVariable Long id) {
-        List<UsuarioDTO.Response> lista = usuarioService.findAllByOrganizacaoId(id).stream()
+        List<UsuarioDTO.Response> lista = usuarioService.buscarTodasOrgPorId(id).stream()
                 .map(usuario -> new UsuarioDTO.Response(
                         usuario.getId(),
                         usuario.getNome(),
@@ -39,7 +43,7 @@ public class UsuarioController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioDTO.Response> listar(@PathVariable Long id) {
-        return usuarioService.findById(id)
+        return usuarioService.buscarPorId(id)
                 .map(usuario -> ResponseEntity.ok(
                         new UsuarioDTO.Response(
                                 usuario.getId(),
@@ -56,6 +60,24 @@ public class UsuarioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/buscar")
+    public ResponseEntity<Page<UsuarioDTO.Response>> buscarPorNome(
+            @RequestParam String nome, @PageableDefault(page = 0, size = 10) Pageable pageable
+    ) {
+        Page<UsuarioDTO.Response> page = usuarioService.buscarPorNome(nome, pageable)
+                .map(a -> new UsuarioDTO.Response(
+                        a.getId(),
+                        a.getNome(),
+                        a.getEmail(),
+                        a.getStatus(),
+                        a.getOrganizacao().getNome(),
+                        a.getRoles().stream()
+                                .map(role -> role.getNome())
+                                .collect(Collectors.toSet()),
+                        a.getCreatedAt()
+                ));
+        return ResponseEntity.ok(page);
+    }
     @PostMapping
     public ResponseEntity<UsuarioDTO.Response> criar(@RequestBody UsuarioDTO.Create dto) {
         Usuario criada = usuarioService.salvar(dto);
@@ -76,7 +98,7 @@ public class UsuarioController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        usuarioService.deleteById(id);
+        usuarioService.deletar(id);
         return ResponseEntity.noContent().build();
     }
 

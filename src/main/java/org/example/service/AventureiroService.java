@@ -1,5 +1,6 @@
 package org.example.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.DTO.AventureiroDTO;
 import org.example.domain.Aventureiro;
 import org.example.domain.ENUM.ClasseAventureiro;
@@ -11,7 +12,6 @@ import org.example.repository.audit.OrganizacaoRepository;
 import org.example.repository.audit.UsuarioRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,17 +19,12 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class AventureiroService {
 
     private final AventureiroRepository aventureiroRepository;
     private final OrganizacaoRepository organizacaoRepository;
     private final UsuarioRepository usuarioRepository;
-
-    public AventureiroService(AventureiroRepository aventureiroRepository, OrganizacaoRepository organizacaoRepository, UsuarioRepository usuarioRepository) {
-        this.aventureiroRepository = aventureiroRepository;
-        this.organizacaoRepository = organizacaoRepository;
-        this.usuarioRepository = usuarioRepository;
-    }
 
     public Page<Aventureiro> buscarComFiltros(Boolean status, ClasseAventureiro classe, Integer nivelMinimo, Pageable pageable) {
         return aventureiroRepository.buscarAventureirosComFiltros(status, classe, nivelMinimo, pageable);
@@ -45,22 +40,13 @@ public class AventureiroService {
 
     public Aventureiro salvar(AventureiroDTO.Create dto) {
         Organizacao org = organizacaoRepository.findById(dto.organizacaoId())
-                .orElseThrow(() -> new BusinessException(
-                        HttpStatus.NOT_FOUND,
-                        "Organização não encontrada"
-                ));
+                .orElseThrow(() -> new BusinessException("Organização não encontrada"));
 
         Usuario usuario = usuarioRepository.findById(dto.usuarioCadastroId())
-                .orElseThrow(() -> new BusinessException(
-                        HttpStatus.NOT_FOUND,
-                        "Usuário não encontrado"
-                ));
+                .orElseThrow(() -> new BusinessException("Usuário não encontrado"));
 
         if (!usuario.getOrganizacao().getId().equals(org.getId())) {
-            throw new BusinessException(
-                    HttpStatus.BAD_REQUEST,
-                    "Usuário não pertence a essa organização, tente outra organização"
-            );
+            throw new BusinessException("Usuário não pertence a essa organização, tente outra organização");
         }
         Aventureiro aventureiro = new Aventureiro();
         aventureiro.setNome(dto.nome());
@@ -75,7 +61,7 @@ public class AventureiroService {
 
     public void deletar(Long id) {
         if (!aventureiroRepository.existsById(id)) {
-            throw new BusinessException(HttpStatus.NOT_FOUND, "Aventureiro não encontrado");
+            throw new BusinessException( "Aventureiro não encontrado");
         }
         aventureiroRepository.deleteById(id);
     }

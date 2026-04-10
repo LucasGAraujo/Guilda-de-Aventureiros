@@ -17,7 +17,13 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 public class Organizacao {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "org_id")
+    @SequenceGenerator(
+            name = "org_id",
+            sequenceName = "org_id_seq",
+            schema = "audit",
+            allocationSize = 1
+    )
     private Long id;
 
     @Column(nullable = false, length = 120, unique = true)

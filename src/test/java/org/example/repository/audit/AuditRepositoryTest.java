@@ -1,12 +1,14 @@
 package org.example.repository.audit;
 
-import org.example.domain.audit.Role;
+import org.example.domain.audit.Organizacao;
 import org.example.domain.audit.Usuario;
+import org.example.domain.audit.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -18,59 +20,65 @@ class AuditRepositoryTest {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private OrganizacaoRepository organizacaoRepository;
 
     @Autowired
     private RoleRepository roleRepository;
 
     @Test
-    @DisplayName("Deve carregar o usuário, suas roles e a organização (Parte 1)")
-    void deveCarregarUsuarioERoles() {
-        List<Usuario> usuarios = usuarioRepository.findAll();
-        assertThat(usuarios)
-                .as("O banco legado deve ter pelo menos um usuário cadastrado")
-                .isNotEmpty();
-        Usuario usuario = usuarios.stream()
-                .filter(u -> u.getRoles() != null && !u.getRoles().isEmpty())
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("Nenhum usuário com roles foi encontrado no banco legado!"));
-        assertThat(usuario.getOrganizacao())
-                .as("O usuário deve possuir uma organização vinculada")
-                .isNotNull();
-        assertThat(usuario.getRoles())
-                .as("O usuário deve possuir roles")
-                .isNotEmpty();
-    }
-    @Test
-    @DisplayName("Deve listar roles com suas permissões (Parte 1)")
-    void deveCarregarRolesEPermissoes() {
-        List<Role> roles = roleRepository.findAll();
-        assertThat(roles)
-                .as("O banco legado deve ter pelo menos uma Role cadastrada")
-                .isNotEmpty();
-        Role role = roles.stream()
-                .filter(r -> r.getPermissions() != null && !r.getPermissions().isEmpty())
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("Nenhuma role com permissões foi encontrada no banco legado!"));
-        assertThat(role.getPermissions())
-                .as("As permissões devem estar acessíveis através da role")
-                .isNotEmpty();
+    @DisplayName("Deve buscar usuários por organização com roles")
+    void deveBuscarUsuariosPorOrganizacao() {
+        List<Usuario> usuarios =
+                usuarioRepository.findAllWithRolesByOrganizacaoId(1L);
+        assertThat(usuarios).isNotEmpty();
+        Usuario usuario = usuarios.get(0);
+        assertThat(usuario.getOrganizacao()).isNotNull();
+        assertThat(usuario.getRoles()).isNotEmpty();
     }
 
     @Test
-    @DisplayName("Prova de Conceito Parte 1: Validação Geral do Legado")
-    void deveValidarMapeamentoDoSistemaLegado() {
-        List<Usuario> usuarios = usuarioRepository.findAll();
-        assertThat(usuarios).isNotEmpty();
-        Usuario usuario = usuarios.stream()
-                .filter(u -> u.getRoles() != null && !u.getRoles().isEmpty())
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("Nenhum usuário válido encontrado"));
-        assertThat(usuario.getOrganizacao().getId())
-                .as("O ID da Organização deve ter sido mapeado corretamente")
-                .isNotNull();
-        Role primeiraRole = usuario.getRoles().iterator().next();
-        assertThat(primeiraRole.getId())
-                .as("A Role deve ter sido mapeada corretamente")
-                .isNotNull();
+    @DisplayName("Deve buscar roles com permissões por organização")
+    void deveBuscarRolesComPermissoes() {
+        List<Role> roles =
+                roleRepository.findAllWithPermissionsByOrganizacaoId(1L);
+        assertThat(roles).isNotEmpty();
+        Role role = roles.get(0);
+        assertThat(role.getPermissions()).isNotEmpty();
+    }
+
+
+    @Test
+    void deveBuscarOrganizacaoPorId() {
+        Organizacao org = organizacaoRepository.findById(1L).orElse(null);
+        assertThat(org).isNotNull();
+        assertThat(org.getId()).isEqualTo(1L);
+    }
+
+
+    @Test
+    void deveBuscarUsuarioPorNome() {
+        Organizacao org = new Organizacao();
+        org.setNome("Org Teste");
+        org = organizacaoRepository.save(org);
+        Usuario u = new Usuario();
+        u.setNome("lucas");
+        u.setEmail("lucas@test.com");
+        u.setOrganizacao(org);
+        u.setSenhaHash("123");
+        usuarioRepository.save(u);
+        List<Usuario> result =
+                usuarioRepository.findByNomeContainingIgnoreCase("lucas", Pageable.unpaged())
+                        .getContent();
+        assertThat(result).isNotEmpty();
+    }
+
+    @Test
+    void deveBuscarUsuarioComRolesPorId() {
+        Usuario usuario =
+                usuarioRepository.findByIdWithRoles(1L).orElse(null);
+
+        assertThat(usuario).isNotNull();
+        assertThat(usuario.getRoles()).isNotEmpty();
     }
 }
