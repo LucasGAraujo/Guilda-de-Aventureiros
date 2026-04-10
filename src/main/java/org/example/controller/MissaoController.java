@@ -35,7 +35,6 @@ public class MissaoController {
         return ResponseEntity.ok(missaoService.listarMissoes(status, nivelPerigo, dataInicio, dataFim, pageable));
     }
 
-
     @GetMapping("/{id}/participantes")
     public ResponseEntity<MissaoDTO.Detalhe> listarMissaoComParticipantes(@PathVariable Long id) {
         return missaoService.buscarMissaoComParticipantes(id)
@@ -44,6 +43,7 @@ public class MissaoController {
                             .map(p -> new MissaoDTO.ParticipanteResumo(
                                     p.getAventureiro().getNome(),
                                     p.getRecompensaOuro(),
+                                    p.getPapel(),
                                     p.getDestaque()))
                             .toList();
 
@@ -52,6 +52,9 @@ public class MissaoController {
                             m.getTitulo(),
                             m.getNivelPerigo(),
                             m.getStatus(),
+                            m.getDataInicio(),
+                            m.getDataFim(),
+                            m.getOrganizacao().getNome(),
                             participantes
                     );
                     return ResponseEntity.ok(detalhe);

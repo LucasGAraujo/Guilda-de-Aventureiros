@@ -31,12 +31,17 @@ public class MissaoDTO {
             String titulo,
             NivelPerigo nivelPerigo,
             StatusMissao status,
+            LocalDateTime dataInicio,
+            LocalDateTime dataFim,
+            String nomeOrganizacao,
             List<ParticipanteResumo> participantes
     ) {}
+
 
     public record ParticipanteResumo(
             String nomeAventureiro,
             BigDecimal recompensa,
+            org.example.domain.ENUM.PapelMissao papel,
             Boolean destaque
     ) {}
 }
