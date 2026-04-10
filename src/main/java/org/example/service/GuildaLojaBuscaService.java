@@ -3,6 +3,7 @@ package org.example.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.json.JsonData;
+import lombok.RequiredArgsConstructor;
 import org.example.domain.ProdutoLojaDocument;
 import org.example.DTO.AgregacaoCategoriaDTO;
 import org.example.DTO.ProdutoLojaResponseDTO;
@@ -14,14 +15,12 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class GuildaLojaBuscaService {
 
     private final ElasticsearchClient client;
     private final String INDEX_NAME = "guilda_loja";
 
-    public GuildaLojaBuscaService(ElasticsearchClient client) {
-        this.client = client;
-    }
 
     public List<ProdutoLojaResponseDTO> buscarProdutosPorTermo(String termo) throws IOException {
         SearchResponse<ProdutoLojaDocument> response = client.search(s -> s
