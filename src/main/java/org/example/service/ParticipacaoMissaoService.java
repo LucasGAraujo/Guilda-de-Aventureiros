@@ -6,7 +6,6 @@ import org.example.domain.Missao;
 import org.example.domain.ParticipacaoMissao;
 import org.example.domain.ParticipacaoMissaoId;
 import org.example.exception.BusinessException;
-import org.example.repository.AventureiroRepository;
 import org.example.repository.ParticipacaoMissaoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
