@@ -10,6 +10,10 @@ import java.util.List;
 @Repository
 public interface PainelTaticoMissaoRepository extends JpaRepository<PainelTaticoMissao, Long> {
     List<PainelTaticoMissao> findTop10ByUltimaAtualizacaoGreaterThanEqualOrderByIndiceProntidaoDesc (
-            LocalDateTime dataLimite
+            LocalDateTime datainicio
+    );
+    List<PainelTaticoMissao> findTop10ByUltimaAtualizacaoBetweenOrderByIndiceProntidaoDesc (
+            LocalDateTime datainicio,
+            LocalDateTime dataFim
     );
 }

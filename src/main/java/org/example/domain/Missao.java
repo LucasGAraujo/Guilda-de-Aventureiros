@@ -27,7 +27,7 @@ public class Missao {
     @SequenceGenerator(
             name = "missao_id",
             sequenceName = "missao_id_seq",
-            schema = "audit",
+            schema = "operacoes",
             allocationSize = 1
     )
     private Long id;

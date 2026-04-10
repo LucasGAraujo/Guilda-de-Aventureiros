@@ -21,7 +21,6 @@ public class GuildaLojaBuscaService {
     private final ElasticsearchClient client;
     private final String INDEX_NAME = "guilda_loja";
 
-
     public List<ProdutoLojaResponseDTO> buscarProdutosPorTermo(String termo) throws IOException {
         SearchResponse<ProdutoLojaDocument> response = client.search(s -> s
                 .index(INDEX_NAME)

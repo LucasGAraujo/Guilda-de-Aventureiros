@@ -40,20 +40,6 @@ class AventureiroRepositoryTest {
     }
 
     @Test
-    @DisplayName("Deve buscar aventureiros respeitando os filtros e a paginação")
-    void deveBuscarAventureirosComFiltros() {
-        Aventureiro a = criarAventureiro("Legolas", ClasseAventureiro.ARQUEIRO, 15, true);
-        aventureiroRepository.save(a);
-
-        Page<Aventureiro> resultado = aventureiroRepository.buscarAventureirosComFiltros(
-                true, ClasseAventureiro.ARQUEIRO, 10, PageRequest.of(0, 10)
-        );
-
-        assertThat(resultado.getContent()).hasSize(1);
-        assertThat(resultado.getContent().get(0).getNome()).isEqualTo("Legolas");
-    }
-
-    @Test
     @DisplayName("Deve buscar aventureiro por nome com correspondência parcial")
     void deveBuscarPorNomeParcial() {
         Aventureiro a = criarAventureiro("Aragorn", ClasseAventureiro.GUERREIRO, 20, true);

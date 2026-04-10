@@ -1,10 +1,7 @@
 package org.example.domain.audit;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
@@ -14,10 +11,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ApiKey {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "keys_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "api_keys_id")
     @SequenceGenerator(
-            name = "keys_id",
-            sequenceName = "keys_id_seq",
+            name = "api_keys_id",
+            sequenceName = "api_keys_id_seq",
             schema = "audit",
             allocationSize = 1
     )

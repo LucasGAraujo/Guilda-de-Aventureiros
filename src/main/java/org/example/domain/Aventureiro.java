@@ -2,10 +2,7 @@ package org.example.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.example.domain.ENUM.ClasseAventureiro;
 import org.example.domain.audit.Organizacao;
 import org.example.domain.audit.Usuario;
@@ -26,7 +23,7 @@ public class Aventureiro {
     @SequenceGenerator(
             name = "aventureiro_id",
             sequenceName = "aventureiro_id_seq",
-            schema = "audit",
+            schema = "operacoes",
             allocationSize = 1
     )
     private Long id;
