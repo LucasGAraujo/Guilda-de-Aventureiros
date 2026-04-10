@@ -42,7 +42,7 @@ class MissaoRepositoryTest {
         Missao m = new Missao();
         m.setTitulo("Limpar o Porão da Taverna");
         m.setStatus(StatusMissao.PLANEJADA);
-        m.setNivelPerigo(NivelPerigo.RANK_A);
+        m.setNivelPerigo(NivelPerigo.EXTREMO);
         m.setOrganizacao(organizacaoBase);
         m.setDataCriacao(LocalDateTime.now());
 
@@ -53,7 +53,7 @@ class MissaoRepositoryTest {
 
         Page<Missao> resultado = missaoRepository.listarMissoes(
                 StatusMissao.PLANEJADA,
-                NivelPerigo.RANK_A,
+                NivelPerigo.EXTREMO,
                 null,
                 null,
                 PageRequest.of(0, 10)
@@ -70,7 +70,7 @@ class MissaoRepositoryTest {
         Missao m = new Missao();
         m.setTitulo("Invasão Orc");
         m.setStatus(StatusMissao.EM_ANDAMENTO);
-        m.setNivelPerigo(NivelPerigo.RANK_B);
+        m.setNivelPerigo(NivelPerigo.EXTREMO);
         m.setOrganizacao(organizacaoBase);
         m.setDataCriacao(LocalDateTime.now());
 
