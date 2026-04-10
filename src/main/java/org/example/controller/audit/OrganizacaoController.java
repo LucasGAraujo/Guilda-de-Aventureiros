@@ -1,7 +1,7 @@
 package org.example.controller.audit;
 
+import lombok.RequiredArgsConstructor;
 import org.example.DTO.audit.OrganizacaoDTO;
-import org.example.domain.audit.Organizacao;
 import org.example.service.audit.OrganizacaoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,11 +10,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/organizacoes")
+@RequiredArgsConstructor
 public class OrganizacaoController {
     private final OrganizacaoService organizacaoService;
-    public OrganizacaoController(OrganizacaoService organizacaoService) {
-        this.organizacaoService = organizacaoService;
-    }
+
     @GetMapping
     public ResponseEntity<List<OrganizacaoDTO.Response>> listar() {
         List<OrganizacaoDTO.Response> lista = organizacaoService.listarOrganizacoes().stream()

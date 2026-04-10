@@ -14,14 +14,14 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-
+@Transactional
 public class CompanheiroService {
 
     private final CompanheiroRepository companheiroRepository;
     private final AventureiroRepository aventureiroRepository;
 
 
-    @Transactional
+
     public Companheiro salvar(Long aventureiroId, CompanheiroDTO.Request dto) {
         Aventureiro aventureiro = aventureiroRepository.findById(aventureiroId).orElseThrow(() -> new BusinessException( "Aventureiro não encontrado"));
 
@@ -38,7 +38,6 @@ public class CompanheiroService {
         return companheiroRepository.save(companheiro);
     }
 
-    @Transactional
     public Companheiro atualizar(Long companheiroId, CompanheiroDTO.Request dto) {
         Companheiro companheiro = companheiroRepository.findById(companheiroId).orElseThrow(() -> new BusinessException( "Companheiro não encontrado"));
         companheiro.setNome(dto.nome());
@@ -48,7 +47,6 @@ public class CompanheiroService {
         return companheiroRepository.save(companheiro);
     }
 
-    @Transactional
     public void deletar(Long companheiroId) {
         Companheiro companheiro = companheiroRepository.findById(companheiroId).orElseThrow(() -> new BusinessException( "Companheiro não encontrado"));
         companheiroRepository.delete(companheiro);

@@ -1,9 +1,7 @@
 package org.example.service.audit;
 
 import lombok.RequiredArgsConstructor;
-import org.example.domain.audit.Organizacao;
 import org.example.domain.audit.Role;
-import org.example.DTO.audit.RoleDTO;
 import org.example.exception.BusinessException;
 import org.example.repository.audit.OrganizacaoRepository;
 import org.example.repository.audit.RoleRepository;

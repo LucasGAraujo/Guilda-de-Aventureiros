@@ -1,5 +1,6 @@
 package org.example.controller.audit;
 
+import lombok.RequiredArgsConstructor;
 import org.example.DTO.audit.RoleDTO;
 import org.example.service.audit.RoleService;
 import org.springframework.http.ResponseEntity;
@@ -9,12 +10,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/roles")
+@RequiredArgsConstructor
+
 public class RoleController {
 
     private final RoleService roleService;
-    public RoleController(RoleService roleService) {
-        this.roleService = roleService;
-    }
+
 
     @GetMapping("/organizacao/{id}")
     public ResponseEntity<List<RoleDTO.Response>> listarRolePorOrganizacao(@PathVariable Long id) {

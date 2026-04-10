@@ -1,7 +1,6 @@
 package org.example.service.audit;
 
 import lombok.RequiredArgsConstructor;
-import org.example.domain.Aventureiro;
 import org.example.domain.audit.Organizacao;
 import org.example.domain.audit.Role;
 import org.example.domain.audit.Usuario;

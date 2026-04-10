@@ -1,6 +1,6 @@
 package org.example.controller.audit;
 
-import org.example.DTO.AventureiroDTO;
+import lombok.RequiredArgsConstructor;
 import org.example.domain.audit.Usuario;
 import org.example.DTO.audit.UsuarioDTO;
 import org.example.service.audit.UsuarioService;
@@ -16,12 +16,12 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/usuarios")
+@RequiredArgsConstructor
+
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
-    public UsuarioController(UsuarioService usuarioService) {
-        this.usuarioService = usuarioService;
-    }
+
 
     @GetMapping("/organizacao/{id}")
     public ResponseEntity<List<UsuarioDTO.Response>> listarUsuarioPorOrganizacao(@PathVariable Long id) {

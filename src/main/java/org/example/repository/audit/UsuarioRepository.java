@@ -1,6 +1,5 @@
 package org.example.repository.audit;
 
-import org.example.domain.Aventureiro;
 import org.example.domain.audit.Usuario;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
