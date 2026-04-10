@@ -1,7 +1,6 @@
 package org.example.controller;
 
 import org.example.DTO.MissaoDTO;
-import org.example.DTO.MissaoMetricasDTO;
 import org.example.domain.ENUM.NivelPerigo;
 import org.example.domain.ENUM.StatusMissao;
 import org.example.domain.Missao;
@@ -75,6 +74,21 @@ public class MissaoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PatchMapping("/{id}/iniciar")
+    public ResponseEntity<String> iniciar(@PathVariable Long id) {
+        Missao missao = missaoService.iniciarMissao(id);
+        return ResponseEntity.ok("Missão '" + missao.getTitulo() + "' foi iniciada com sucesso");
+    }
+    @PatchMapping("/{id}/cancelar")
+    public ResponseEntity<String> cancelar(@PathVariable Long id) {
+        Missao missao = missaoService.cancelarMissao(id);
+        return ResponseEntity.ok("Missão '" + missao.getTitulo() + "' foi cancelada com sucesso");
+    }
+    @PatchMapping("/{id}/concluido")
+    public ResponseEntity<String> concluido(@PathVariable Long id) {
+        Missao missao = missaoService.concluirMissao(id);
+        return ResponseEntity.ok("Missão '" + missao.getTitulo() + "' foi concluida com sucesso");
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {

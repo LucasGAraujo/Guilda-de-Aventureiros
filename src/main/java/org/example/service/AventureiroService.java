@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -77,7 +76,7 @@ public class AventureiroService {
 
     public void deletar(Long id) {
         if (!aventureiroRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aventureiro não encontrado");
+            throw new BusinessException(HttpStatus.NOT_FOUND, "Aventureiro não encontrado");
         }
         aventureiroRepository.deleteById(id);
     }
