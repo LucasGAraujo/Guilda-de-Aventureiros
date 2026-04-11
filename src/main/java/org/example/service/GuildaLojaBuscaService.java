@@ -98,6 +98,23 @@ public class GuildaLojaBuscaService {
         );
         return converterparaDTO(response);
     }
+    public Double precoMedio() throws IOException {
+        SearchResponse<Void> response = client.search(s -> s
+                        .index(INDEX_NAME)
+                        .query(q -> q.range(r -> r
+                                .field("preco")
+                        ))
+                        .aggregations("preco_medio", a -> a
+                                .avg(avg -> avg.field("preco"))
+                        ),
+                Void.class
+        );
+
+        return response.aggregations()
+                .get("preco_medio")
+                .avg()
+                .value();
+    }
 
     public List<ProdutoLojaResponseDTO> buscaAvancada(String categoria, String raridade, Double min, Double max) throws IOException {
         SearchResponse<ProdutoLojaDocument> response = client.search(s -> s
