@@ -75,6 +75,10 @@ public class GuildaLojaController {
     public Map<String, Long> agruparFaixasPreco() throws IOException {
         return guildaservice.agruparFaixasPreco();
     }
+    @GetMapping("/agregacoes/preco-medio")
+    public Double precoMedio() throws  IOException {
+        return guildaservice.precoMedio();
+    }
 
     @GetMapping("/agregacao/categorias")
     public List<AgregacaoCategoriaDTO> contarPorCategoria() throws IOException {
